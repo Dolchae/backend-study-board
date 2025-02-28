@@ -1,6 +1,8 @@
 package com.example.jpaPractice.entity;
 
+import com.example.jpaPractice.dto.CommentDto;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,4 +28,18 @@ public class Comment {
 
     private LocalDateTime createdAt =  LocalDateTime.now();
     private LocalDateTime updatedAt;
+
+
+    @Builder
+    public Comment(Board board, Member member, String content) {
+        this.board = board;
+        this.member = member;
+        this.content = content;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public void updateComment(String newContent) {
+        this.content = newContent;
+        this.updatedAt = LocalDateTime.now();
+    }
 }

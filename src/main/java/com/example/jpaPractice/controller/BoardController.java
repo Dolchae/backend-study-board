@@ -11,7 +11,7 @@ import java.util.List;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
-@RequestMapping("/boards")
+@RequestMapping("/board")
 public class BoardController {
 
     private final BoardService boardService;
@@ -23,8 +23,6 @@ public class BoardController {
     //게시글 작성
     @PostMapping
     public ResponseEntity<BoardDto> createBoard(@RequestBody BoardDto boardDto) {
-        System.out.println("Received DTO: " + boardDto); // ✅ 확인용 로그 추가
-
         return ok(boardService.createBoard(boardDto));
     }
 
@@ -46,6 +44,7 @@ public class BoardController {
         return ok(boardService.updateBoard(id, boardDto));
     }
 
+    //게시글 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBoard(@PathVariable Long id) {
         boardService.deleteBoard(id);

@@ -1,4 +1,4 @@
-package com.example.jpaPractice;
+package com.example.jpaPractice.exception;
 
 public class BoardNotFoundException extends RuntimeException {
     public BoardNotFoundException(String message) {

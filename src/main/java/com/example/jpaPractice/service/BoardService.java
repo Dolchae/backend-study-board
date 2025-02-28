@@ -1,27 +1,26 @@
 package com.example.jpaPractice.service;
 
-import com.example.jpaPractice.BoardNotFoundException;
+import com.example.jpaPractice.exception.BoardNotFoundException;
 import com.example.jpaPractice.dto.BoardDto;
 import com.example.jpaPractice.entity.Board;
 import com.example.jpaPractice.entity.Member;
 import com.example.jpaPractice.repository.BoardRepository;
 import com.example.jpaPractice.repository.MemberRepository;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class BoardService {
 
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
 
-    public BoardService(BoardRepository boardRepository, MemberRepository memberRepository) {
-        this.boardRepository = boardRepository;
-        this.memberRepository = memberRepository;
-    }
 
     //게시글 생성
     public BoardDto createBoard(BoardDto boardDto) {
@@ -31,21 +30,23 @@ public class BoardService {
         Board board = new Board(boardDto.getTitle(), boardDto.getContent(), member);
         boardRepository.save(board);
 
-        return convertToDto(board);
+        return new BoardDto(board);
     }
 
     //모든 게시글 조회
+    @Transactional(readOnly = true)
     public List<BoardDto> getAllBoards() {
         return boardRepository.findAll().stream()
-                .map(this::convertToDto)
+                .map(BoardDto::new)
                 .collect(Collectors.toList());
     }
 
     //단일 게시글 조회
+    @Transactional(readOnly = true)
     public BoardDto getBoard(Long id) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardNotFoundException("게시글을 찾을 수 없습니다."));
-        return convertToDto(board);
+        return new BoardDto(board);
     }
 
     //게시글 수정
@@ -56,7 +57,7 @@ public class BoardService {
         board.update(boardDto.getTitle(),boardDto.getContent());
         boardRepository.save(board);
 
-        return convertToDto(board);
+        return new BoardDto(board);
     }
 
     //게시글 삭제
@@ -67,13 +68,4 @@ public class BoardService {
         boardRepository.deleteById(id);
     }
 
-    //엔티티 -> DTO
-    private BoardDto convertToDto(Board board) {
-        BoardDto dto = new BoardDto();
-        dto.setId(board.getId());
-        dto.setTitle(board.getTitle());
-        dto.setContent(board.getContent());
-        dto.setMemberUsername(board.getMember().getUsername());
-        return dto;
-    }
 }
