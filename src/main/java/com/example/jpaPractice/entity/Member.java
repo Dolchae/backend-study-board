@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -28,4 +27,12 @@ public class Member {
     private String nickname;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    public Member(String username, String password, String email, String nickname) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.nickname = nickname;
+        this.createdAt = LocalDateTime.now();
+    }
 }
