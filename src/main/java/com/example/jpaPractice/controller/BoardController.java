@@ -12,6 +12,7 @@ import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("/board")
+@CrossOrigin(origins = "http://localhost:5500")
 public class BoardController {
 
     private final BoardService boardService;

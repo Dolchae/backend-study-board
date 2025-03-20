@@ -9,6 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/comment")
+@CrossOrigin(origins = "http://localhost:5500")
 public class CommentController {
 
     private final CommentService commentService;
@@ -35,12 +36,14 @@ public class CommentController {
         return ResponseEntity.ok(commentService.getCommentByBoardId(boardId));
         }
 
+
     //특정 댓글 수정
     @PutMapping("/{commentId}")
     public ResponseEntity<CommentDto> updateComment(@PathVariable Long commentId, @RequestBody CommentDto commentDto) {
         CommentDto updatedComment = commentService.updateComment(commentId, commentDto.getContent());
         return ResponseEntity.ok(updatedComment);
     }
+
 
     //특정 댓글 삭제
     @DeleteMapping("/{commentId}")
