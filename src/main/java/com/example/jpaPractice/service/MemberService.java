@@ -1,5 +1,6 @@
 package com.example.jpaPractice.service;
 
+import com.example.jpaPractice.dto.LoginRequestDto;
 import com.example.jpaPractice.dto.MemberRequestDto;
 import com.example.jpaPractice.entity.Member;
 import com.example.jpaPractice.repository.MemberRepository;
@@ -36,6 +37,18 @@ public class MemberService {
         //Member 엔티티 생성 후 저장.
         Member member = new Member(requestDto.getUsername(), encodedPassword, requestDto.getEmail(), requestDto.getNickname());
         memberRepository.save(member);
+    }
+
+    public String login(LoginRequestDto requestDto) {
+        Member member = memberRepository.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("이메일을 찾을 수 없습니다."));
+
+        if (!passwordEncoder.matches(requestDto.getPassword(), member.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        return "로그인 성공!";
+
     }
 
 

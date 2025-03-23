@@ -1,5 +1,6 @@
 package com.example.jpaPractice.controller;
 
+import com.example.jpaPractice.dto.LoginRequestDto;
 import com.example.jpaPractice.dto.MemberRequestDto;
 import com.example.jpaPractice.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -19,5 +20,11 @@ public class MemberController {
     public ResponseEntity<String> register(@RequestBody MemberRequestDto memberRequestDto) {
         memberService.register(memberRequestDto);
         return ResponseEntity.ok("회원가입 성공!");
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody LoginRequestDto loginRequestDto) {
+        String result = memberService.login(loginRequestDto);
+        return ResponseEntity.ok(result);
     }
 }
