@@ -39,7 +39,7 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    public String login(LoginRequestDto requestDto) {
+    public Member login(LoginRequestDto requestDto) {
         Member member = memberRepository.findByEmail(requestDto.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("이메일을 찾을 수 없습니다."));
 
@@ -47,7 +47,7 @@ public class MemberService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        return "로그인 성공!";
+        return member;
 
     }
 
