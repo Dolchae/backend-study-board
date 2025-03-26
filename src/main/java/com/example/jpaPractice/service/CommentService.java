@@ -4,10 +4,13 @@ import com.example.jpaPractice.dto.CommentDto;
 import com.example.jpaPractice.entity.Board;
 import com.example.jpaPractice.entity.Comment;
 import com.example.jpaPractice.entity.Member;
+import com.example.jpaPractice.exception.BoardNotFoundException;
+import com.example.jpaPractice.exception.UnauthorizedAccessException;
 import com.example.jpaPractice.repository.BoardRepository;
 import com.example.jpaPractice.repository.CommentRepository;
 import com.example.jpaPractice.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,14 +26,14 @@ public class CommentService {
     private final MemberRepository memberRepository;
 
     //댓글 생성
-    public CommentDto createComment(Long boardId, String memberUsername, String content) {
+    public CommentDto createComment(Long boardId, String content) {
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new RuntimeException("Board not found"));
-        Member member = memberRepository.findByUsername(memberUsername)
-                .orElseThrow(() -> new RuntimeException("Member not found"));
-        Comment comment = Comment.builder().board(board).member(member).content(content).build();
+                .orElseThrow(() -> new BoardNotFoundException("게시판을 찾을 수 없습니다."));
+        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+        Comment comment = Comment.builder().board(board).member(member).content(content).build();
         commentRepository.save(comment);
+
         return new CommentDto(comment);
     }
 
@@ -46,7 +49,12 @@ public class CommentService {
     //댓글 수정
     public CommentDto updateComment(Long commentId, String newContent) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
+                .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
+
+        Member currentUser =(Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!comment.getMember().getId().equals(currentUser.getId())) {
+            throw new UnauthorizedAccessException("작성자만 수정할 수 있습니다.");
+        }
         comment.updateComment(newContent);
         return new CommentDto(comment);
     }
@@ -54,7 +62,13 @@ public class CommentService {
     //댓글 삭제
     public void deleteComment(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
+                .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
+
+        Member currentUser =(Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!comment.getMember().getId().equals(currentUser.getId())) {
+            throw new UnauthorizedAccessException("작성자만 삭제할 수 있습니다.");
+        }
+
         commentRepository.delete(comment);
     }
 

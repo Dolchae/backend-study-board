@@ -4,9 +4,11 @@ import com.example.jpaPractice.exception.BoardNotFoundException;
 import com.example.jpaPractice.dto.BoardDto;
 import com.example.jpaPractice.entity.Board;
 import com.example.jpaPractice.entity.Member;
+import com.example.jpaPractice.exception.UnauthorizedAccessException;
 import com.example.jpaPractice.repository.BoardRepository;
 import com.example.jpaPractice.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,16 +24,19 @@ public class BoardService {
     private final MemberRepository memberRepository;
 
 
-    //게시글 생성
     public BoardDto createBoard(BoardDto boardDto) {
-        Member member = memberRepository.findByUsername(boardDto.getMemberUsername())
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        Member principal = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+
+        Member member = memberRepository.findByEmail(principal.getEmail()).orElseThrow(() -> new RuntimeException("Member Not Found"));
 
         Board board = new Board(boardDto.getTitle(), boardDto.getContent(), member);
-        boardRepository.save(board);
+        boardRepository.save(board); //영속 상태로 만들어주기
 
         return new BoardDto(board);
     }
+
+
 
     //모든 게시글 조회
     @Transactional(readOnly = true)
@@ -42,10 +47,12 @@ public class BoardService {
     }
 
     //단일 게시글 조회
-    @Transactional(readOnly = true)
+    @Transactional
     public BoardDto getBoard(Long id) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardNotFoundException("게시글을 찾을 수 없습니다."));
+        board.increaseViewCount(); //조회수 증가
+
         return new BoardDto(board);
     }
 
@@ -54,18 +61,26 @@ public class BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardNotFoundException("게시글을 찾을 수 없습니다."));
 
+        Member currentUser = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!board.getMember().getId().equals(currentUser.getId())) {
+            throw new UnauthorizedAccessException("작성자만 수정할 수 있습니다.");
+        }
+
         board.update(boardDto.getTitle(),boardDto.getContent());
-        boardRepository.save(board);
 
         return new BoardDto(board);
     }
 
     //게시글 삭제
     public void deleteBoard(Long id) {
-        if(!boardRepository.existsById(id)) {
-            throw new BoardNotFoundException("게시글을 찾을 수 없습니다.");
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new BoardNotFoundException("게시글을 찾을 수 없습니다."));
+
+        Member currentUser = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!board.getMember().getId().equals(currentUser.getId())) {
+            throw new UnauthorizedAccessException("작성자만 삭제할 수 있습니다.");
         }
+
         boardRepository.deleteById(id);
     }
-
 }

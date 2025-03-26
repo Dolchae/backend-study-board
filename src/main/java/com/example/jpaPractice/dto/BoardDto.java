@@ -13,13 +13,18 @@ public class BoardDto {
     private Long id;
     private String title;
     private String content;
-    private String memberUsername; // 작성자 이름만 전달
+    private int viewCount;
+    private String username;
 
     public BoardDto(Board board) {
         this.id = board.getId();
         this.title = board.getTitle();
         this.content = board.getContent();
-        this.memberUsername = board.getMember().getUsername();
+        this.viewCount = board.getViewcount();
+        this.username = board.getMember().getUsername();
+
     }
+
+
 
 }

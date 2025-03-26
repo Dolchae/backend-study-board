@@ -4,6 +4,8 @@ import com.example.jpaPractice.dto.LoginRequestDto;
 import com.example.jpaPractice.dto.MemberRequestDto;
 import com.example.jpaPractice.entity.Member;
 import com.example.jpaPractice.service.MemberService;
+import com.example.jpaPractice.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
+    private final AuthService authService;
 
     @PostMapping("/signup")
     public ResponseEntity<String> register(@RequestBody MemberRequestDto memberRequestDto) {
@@ -22,9 +25,8 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequestDto loginRequestDto, HttpSession session) {
-        Member member = memberService.login(loginRequestDto);
-        session.setAttribute("loginMember",member.getId());
+    public ResponseEntity<String> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletRequest request) {
+        authService.login(loginRequestDto, request);
         return ResponseEntity.ok("로그인 성공!");
     }
 
@@ -49,5 +51,6 @@ public class MemberController {
             return ResponseEntity.status(401).body("로그인 안 됨 (세션 없음)");
         }
         return ResponseEntity.ok("현재 로그인한 사용자 ID: " + memberId);
+
     }
 }
