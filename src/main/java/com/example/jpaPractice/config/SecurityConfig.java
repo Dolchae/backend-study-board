@@ -18,14 +18,23 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/api/member/**").permitAll()
+//                        .requestMatchers("/api/board/**", "/api/comment/**").authenticated()
+//                        .anyRequest().authenticated()
+//                );
+
         http
                 .csrf(csrf -> csrf.disable())  // CSRF 비활성화 (Postman 테스트 가능하게)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/member/signup", "/api/member/login").permitAll()  // 회원가입 & 로그인은 인증 없이 접근 가능
                         .anyRequest().authenticated()  // 그 외 요청은 인증 필요
+                        .anyRequest().permitAll()  // 모든 요청 인증 없이 허용
                 );
+
 
         return http.build();
     }
-
 }

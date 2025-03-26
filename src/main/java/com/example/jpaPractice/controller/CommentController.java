@@ -1,6 +1,7 @@
 package com.example.jpaPractice.controller;
 
 import com.example.jpaPractice.dto.CommentDto;
+import com.example.jpaPractice.dto.CommentRequestDto;
 import com.example.jpaPractice.service.CommentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -8,12 +9,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/comment")
+@RequestMapping("/api/board/{boardId}/comment")
 @CrossOrigin(origins = "http://localhost:5500")
 public class CommentController {
 
     private final CommentService commentService;
-
 
     public CommentController(CommentService commentService) {
         this.commentService = commentService;
@@ -21,17 +21,13 @@ public class CommentController {
 
     //댓글 작성
     @PostMapping
-    public ResponseEntity<CommentDto> createComment(@RequestBody CommentDto commentDto) {
-        CommentDto createdComment = commentService.createComment(
-                commentDto.getBoardId(),
-                commentDto.getMemberUsername(),
-                commentDto.getContent()
-        );
+    public ResponseEntity<CommentDto> createComment(@PathVariable Long boardId, @RequestBody CommentRequestDto requestDto) {
+        CommentDto createdComment = commentService.createComment(boardId, requestDto.getContent());
         return ResponseEntity.ok(createdComment);
     }
 
     //게시글의 모든 댓글 조회
-    @GetMapping("/{boardId}")
+    @GetMapping
     public ResponseEntity<List<CommentDto>> getAllComments(@PathVariable Long boardId) {
         return ResponseEntity.ok(commentService.getCommentByBoardId(boardId));
         }
@@ -51,6 +47,5 @@ public class CommentController {
         commentService.deleteComment(commentId);
         return ResponseEntity.noContent().build();
     }
-
 
 }

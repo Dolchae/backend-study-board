@@ -26,12 +26,18 @@ public class Board {
 
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt;
+    private int viewcount = 0;
 
     public Board(String title, String content, Member member) {
         this.title = title;
         this.content = content;
         this.member = member;
         this.createdAt = LocalDateTime.now(); // 생성 시간 설정
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void increaseViewCount() {
+        this.viewcount++;
     }
 
     //게시글 수정 메서드
