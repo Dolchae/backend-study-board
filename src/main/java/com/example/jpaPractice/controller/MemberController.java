@@ -25,11 +25,11 @@ public class MemberController {
         return ResponseEntity.ok("회원가입 성공!");
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletRequest request) {
-        authService.login(loginRequestDto,request);
-        return ResponseEntity.ok("로그인 성공!");
-    }
+//    @PostMapping("/login") // Security가 /login 요청 처리.
+//    public ResponseEntity<String> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletRequest request) {
+//        authService.login(loginRequestDto,request);
+//        return ResponseEntity.ok("로그인 성공!");
+//    }
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request) {
