@@ -1,5 +1,6 @@
 package com.example.jpaPractice.service;
 
+import com.example.jpaPractice.entity.MemberDetails;
 import com.example.jpaPractice.dto.CommentDto;
 import com.example.jpaPractice.entity.Board;
 import com.example.jpaPractice.entity.Comment;
@@ -29,9 +30,11 @@ public class CommentService {
     public CommentDto createComment(Long boardId, String content) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardNotFoundException("게시판을 찾을 수 없습니다."));
-        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        Comment comment = Comment.builder().board(board).member(member).content(content).build();
+        MemberDetails memberDetails = (MemberDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Member currentUser = memberDetails.getMember();
+
+        Comment comment = Comment.builder().board(board).member(currentUser).content(content).build();
         commentRepository.save(comment);
 
         return new CommentDto(comment);
@@ -51,7 +54,9 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
 
-        Member currentUser =(Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        MemberDetails memberDetails = (MemberDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Member currentUser = memberDetails.getMember();
+
         if(!comment.getMember().getId().equals(currentUser.getId())) {
             throw new UnauthorizedAccessException("작성자만 수정할 수 있습니다.");
         }
@@ -64,7 +69,9 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
 
-        Member currentUser =(Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        MemberDetails memberDetails = (MemberDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Member currentUser = memberDetails.getMember();
+
         if(!comment.getMember().getId().equals(currentUser.getId())) {
             throw new UnauthorizedAccessException("작성자만 삭제할 수 있습니다.");
         }
