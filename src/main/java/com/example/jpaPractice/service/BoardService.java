@@ -1,5 +1,6 @@
 package com.example.jpaPractice.service;
 
+import com.example.jpaPractice.entity.MemberDetails;
 import com.example.jpaPractice.exception.BoardNotFoundException;
 import com.example.jpaPractice.dto.BoardDto;
 import com.example.jpaPractice.entity.Board;
@@ -25,12 +26,10 @@ public class BoardService {
 
 
     public BoardDto createBoard(BoardDto boardDto) {
-        Member principal = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        MemberDetails memberDetails = (MemberDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Member currentUser = memberDetails.getMember();
 
-
-        Member member = memberRepository.findByEmail(principal.getEmail()).orElseThrow(() -> new RuntimeException("Member Not Found"));
-
-        Board board = new Board(boardDto.getTitle(), boardDto.getContent(), member);
+        Board board = new Board(boardDto.getTitle(), boardDto.getContent(), currentUser);
         boardRepository.save(board); //영속 상태로 만들어주기
 
         return new BoardDto(board);
@@ -61,7 +60,9 @@ public class BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardNotFoundException("게시글을 찾을 수 없습니다."));
 
-        Member currentUser = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        MemberDetails memberDetails = (MemberDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Member currentUser = memberDetails.getMember(); //실제 Member 꺼내기.
+
         if(!board.getMember().getId().equals(currentUser.getId())) {
             throw new UnauthorizedAccessException("작성자만 수정할 수 있습니다.");
         }
@@ -76,7 +77,9 @@ public class BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardNotFoundException("게시글을 찾을 수 없습니다."));
 
-        Member currentUser = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        MemberDetails memberDetails = (MemberDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Member currentUser = memberDetails.getMember();
+
         if(!board.getMember().getId().equals(currentUser.getId())) {
             throw new UnauthorizedAccessException("작성자만 삭제할 수 있습니다.");
         }
