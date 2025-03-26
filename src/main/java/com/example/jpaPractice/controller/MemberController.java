@@ -3,6 +3,7 @@ package com.example.jpaPractice.controller;
 import com.example.jpaPractice.entity.MemberDetails;
 import com.example.jpaPractice.dto.LoginRequestDto;
 import com.example.jpaPractice.dto.MemberRequestDto;
+import com.example.jpaPractice.entity.Member;
 import com.example.jpaPractice.service.MemberService;
 import com.example.jpaPractice.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +26,6 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-
     public ResponseEntity<String> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletRequest request) {
         authService.login(loginRequestDto,request);
         return ResponseEntity.ok("로그인 성공!");

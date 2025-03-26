@@ -49,7 +49,6 @@ public class SecurityConfig {
                 .formLogin(form -> form.disable()) //REST API이므로 비활성화.
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)); //세션 유지
 
-
         return http.build();
     }
 }
