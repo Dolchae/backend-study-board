@@ -38,7 +38,7 @@ public class MemberService {
         Member member = new Member(requestDto.getUsername(), encodedPassword, requestDto.getEmail(), requestDto.getNickname());
         memberRepository.save(member);
     }
-    
+
 
 
 

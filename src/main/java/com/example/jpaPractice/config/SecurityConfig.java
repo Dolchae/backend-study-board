@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -42,12 +43,11 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/member/signup", "/api/member/login").permitAll()
+                        .requestMatchers("/api/member/signup", "/api/member/login","/login").permitAll()
                         .requestMatchers("/api/board/**", "/api/comment/**").authenticated()
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form.disable()) //REST API이므로 비활성화.
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)); //세션 유지
+                .formLogin(Customizer.withDefaults()); // 자동 로그인 활성화
 
         return http.build();
     }
